@@ -1,0 +1,44 @@
+{
+  "version": "0.3",
+  "name": "TiempoBus",
+  "description": "Tiempos de paso de autobuses en Alicante",
+  "launch_path": "/app.html#",
+  "icons": {
+    "16": "/tiempobus/img/ic_tiempobus_3-16.png",
+    "48": "/tiempobus/img/ic_tiempobus_3-48.png",
+    "128": "/tiempobus/img/ic_tiempobus_3-128.png"
+  },
+  "developer": {
+    "name": "Alberto Montiel",
+    "url": "http://alberapps.blogspot.com"
+  },
+  "installs_allowed_from": ["*"],
+  
+  "locales": {
+    "es": {
+      "description": "Tiempos de paso de autobuses en Alicante",
+      "developer": {
+        "url": "http://alberapps.blogspot.com"
+      }
+    },
+    "ca": {
+      "description": "Tiempobus Alacant",
+      "developer": {
+        "url": "http://alberapps.blogspot.com"
+      }
+    },
+    "en": {
+      "description": "Tiempobus Alicante",
+      "developer": {
+        "url": "http://alberapps.blogspot.com"
+      }
+    }
+  },
+  "default_locale": "es",
+  
+  "type": "privileged",
+  "permissions": {
+        "systemXHR": {}	
+   }
+
+}

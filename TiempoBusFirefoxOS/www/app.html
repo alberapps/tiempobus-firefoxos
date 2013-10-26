@@ -1,0 +1,489 @@
+<!--  
+ *  TiempoBus - Informacion sobre tiempos de paso de autobuses en Alicante
+ *  Copyright (C) 2013 Alberto Montiel
+ *
+ *  Based on http://buildingfirefoxos.com/
+ *
+ *  This program is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ *
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ -->
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, user-scalable=no" />
+<title>TiempoBus</title>
+<!-- Building blocks -->
+<link rel="stylesheet" href="blocks/style/action_menu.css">
+<link rel="stylesheet" href="blocks/style/buttons.css">
+<link rel="stylesheet" href="blocks/style/confirm.css">
+<link rel="stylesheet" href="blocks/style/edit_mode.css">
+<link rel="stylesheet" href="blocks/style/headers.css">
+<link rel="stylesheet" href="blocks/style/input_areas.css">
+<link rel="stylesheet" href="blocks/style/status.css">
+<link rel="stylesheet" href="blocks/style/switches.css">
+<link rel="stylesheet" href="blocks/style_unstable/drawer.css">
+<link rel="stylesheet" href="blocks/style_unstable/lists.css">
+<link rel="stylesheet"
+	href="blocks/style_unstable/progress_activity.css">
+<link rel="stylesheet" href="blocks/style_unstable/scrolling.css">
+<link rel="stylesheet" href="blocks/style_unstable/seekbars.css">
+<link rel="stylesheet" href="blocks/style_unstable/tabs.css">
+<link rel="stylesheet" href="blocks/style_unstable/toolbars.css">
+
+<!-- Icons -->
+<link rel="stylesheet" href="blocks/icons/styles/action_icons.css">
+<link rel="stylesheet" href="blocks/icons/styles/media_icons.css">
+<link rel="stylesheet" href="blocks/icons/styles/comms_icons.css">
+<link rel="stylesheet" href="blocks/icons/styles/settings_icons.css">
+
+<!-- Transitions -->
+<link rel="stylesheet" href="blocks/transitions.css">
+
+<!-- Util CSS: some extra tricks -->
+<link rel="stylesheet" href="blocks/util.css">
+<link rel="stylesheet" href="blocks/fonts.css">
+
+<!-- Additional markup to make Building Blocks kind of cross browser -->
+<link rel="stylesheet" href="blocks/cross_browser.css">
+
+
+
+<style>
+    #index {
+      height: 100%;
+    }
+    [data-position="right"] {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      transform: translateX(100%);
+      -webkit-transform: translateX(100%);
+      z-index: 15;
+      z-index: 100; /* -> drawer */
+    }
+    section[role="region"][data-position="right"] {
+      position: absolute;
+    }
+    [data-position="right"].current {
+      animation: rightToCurrent 0.4s forwards;
+      -webkit-animation: rightToCurrent 0.4s forwards;
+    }
+    [data-position="right"].right {
+      animation: currentToRight 0.4s forwards;
+      -webkit-animation: currentToRight 0.4s forwards;
+    }
+    [data-position="current"].left {
+      animation: currentToLeft 0.4s forwards;
+      -webkit-animation: currentToLeft 0.4s forwards;
+    }
+    [data-position="current"].current {
+      animation: leftToCurrent 0.4s forwards;
+      -webkit-animation: leftToCurrent 0.4s forwards;
+    }
+    [data-position="back"] {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      z-index: -1;
+      opacity: 0;
+      /* z-index: 100; -> drawer */
+    }
+    [data-position="back"].fade-in {
+      z-index: 120;
+      animation: fadeIn 0.2s forwards;
+      -webkit-animation: fadeIn 0.2s forwards;
+    }
+    [data-position="back"].fade-out {
+      animation: fadeOut 0.2s forwards;
+      -webkit-animation: fadeOut 0.2s forwards;
+    }
+
+    [data-position="edit-mode"] {
+      position: absolute;
+      top: -5rem;
+      left: 0;
+      right: 0;
+      bottom: -7rem;
+      z-index: -1;
+      opacity: 0;
+      transition: all 0.3s ease;
+    }
+    [data-position="edit-mode"].edit {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      z-index: 120;
+      opacity: 1;
+    }
+
+    /* Headers */
+    #headers section[role="region"] {
+      margin-bottom: 1.5rem;
+    }
+    #headers section[role="region"]:not(#drawer) {
+      display: inline;
+    }
+    #headers article header:first-child {
+      margin-top: 1.5rem;
+    }
+    #headers section[role="region"] header h2 {
+      margin: 0 0 1.5rem 0;
+    }
+
+    /* Lists */
+    /* to avoid double background effect on press */
+    [data-type=list] li>a:active { 
+      background-color: transparent;
+    }
+
+    /* Drawer */
+    section[role="region"]:not(#drawer) {
+      transition: none;
+      left: 0;
+      z-index: 0;
+      padding-left: 0;
+    }
+    section[data-type="sidebar"] + section[role="region"] > header:first-child > button, 
+    section[data-type="sidebar"] + section[role="region"] > header:first-child > a {
+      background-position: 3.5rem center;
+    }
+
+    /* Switches */
+    #switches label:last-child {
+      margin-left: 2rem;  
+    }
+
+    /* Scrolling */
+    nav[data-type="scrollbar"] {
+      padding-top: 1rem;
+    }
+    nav[data-type="scrollbar"] p {
+      opacity: 1;
+    }
+
+    /* Seek bars */
+    div[role="slider"] > label.icon {
+      background: no-repeat right top;
+      background-size: 3rem auto;
+    }
+    
+    /* Tabs */
+    #buscador .content {
+      padding: 0;
+    }
+    #buscador .content .content {
+      padding: 1.5rem 3rem;
+    }
+
+    /* Filters */
+    [role="tablist"][data-type="filter"] {
+      margin-bottom: 2rem;
+    }
+
+    .bottom[role="tablist"][data-type="filter"] {
+      bottom: auto;
+    }
+
+    /* Device rotation */
+    .landscape section[role="region"]#drawer > header:first-child {
+      /* Whatever needs to be changed on landscape */
+    }
+</style>
+
+
+<script type="text/javascript" defer src="blocks/js/status.js"></script>
+<script type="text/javascript" defer src="blocks/js/seekbars.js"></script>
+
+<script type="text/javascript" defer src="l10n/l10n.js" charset="utf-8"></script>
+<link rel="resource" type="application/l10n" href="tiempobus/locales/locales.ini"/>
+
+</head>
+<body >
+
+<section role="region" class="skin-organic" >
+
+	<section id="index" data-position="current">
+		<section data-type="sidebar">
+			<header>
+				<menu type="toolbar">
+					<a id="ok_inicial" href="#">Ok</a>
+				</menu>
+				<h1>Opciones</h1>
+			</header>
+			<nav>
+				<ul>
+					<li><a id="btn-action-favoritos" href="#" data-l10n-id="l10n_favoritos">Favoritos</a></li>
+					<li><a href="#" id="btn-action-guardar" data-l10n-id="l10n_guardar">Guardar</a></li>
+					<li><a href="#panel1" id="btn-buscador" data-l10n-id="l10n_buscador">Buscador</a></li>
+					<li><a id="btn-action-preferencias" href="#" data-l10n-id="l10n_preferencias">Preferencias</a></li>
+					
+					
+				</ul>				
+			</nav>
+		</section>
+
+		<section id="drawer" role="region" >
+			<header class="fixed">
+				<a href="#"><span class="icon icon-menu">hide sidebar</span></a> <a
+					href="#drawer"><span class="icon icon-menu">show sidebar</span></a>
+				<h1>
+					TiempoBus <em>beta</em>
+					<span id="progreso">						
+					</span>
+				</h1>
+				
+			</header>
+			 
+			<article class="content scrollable header">
+							
+				<section data-type="list" id="lista-tiempos" >
+							
+				</section>
+
+
+				<div role="toolbar">
+				
+					<form role="search" class="bottom">
+						<button class="icon icon-attachment" id="boton-recarga" >Recargar</button>
+						<button type="submit" id="boton-enviar" data-l10n-id="l10n_actualizar">Actualizar</button>
+						<p>
+							<textarea placeholder="Search..." required="" id="parada-entrada">4450</textarea>
+						</p>
+					</form>
+				</div>
+
+				
+			</article>
+
+
+		</section>
+		<!-- end drawer -->
+
+
+
+
+	</section>
+	<!-- end index -->
+
+	<!--·························· Action menu favoritos ··························-->
+	<section id="action-menu-favoritos" data-position="back" class="fullscreen">
+		<form role="dialog" data-type="action">
+			<header> <span data-l10n-id="l10n_opciones">Opciones</span> </header>
+			<!-- this header is optional -->
+			<menu>
+				<button id="btn-favoritos-cargar" data-l10n-id="l10n_cargar_tiempos">Cargar Tiempos</button>
+				<button id="btn-favoritos-modificar" data-l10n-id="l10n_modificar">Modificar</button>
+				<button id="btn-favoritos-eliminar" data-l10n-id="l10n_eliminar">Eliminar</button>
+				
+				<button>Cancelar</button>
+			</menu>
+		</form>
+	</section>
+	
+	<!--·························· Action menu eliminar favorito ··························-->
+  <section id="confirm-eliminar" data-position="back" class="fullscreen">
+    <form role="dialog" data-type="confirm">
+      <section>
+        <h1 data-l10n-id="l10n_eliminar">Eliminar</h1>
+        <p data-l10n-id="l10n_eliminar_preg">¿Seguro que quieres eliminar el favorito?</p>
+      </section>
+      <menu>
+        <button data-l10n-id="l10n_cancelar">Cancelar</button>
+        <button class="danger" id="btn-aceptar-eliminar" data-l10n-id="l10n_aceptar">Aceptar</button>
+      </menu>
+    </form>
+  </section>
+
+	<!--·························· Edit mode ··························-->
+  <section id="edit-mode" data-position="edit-mode">
+    <form role="dialog" data-type="edit">
+    <section>
+      <header>
+        <button><span class="icon icon-close">close</span></button>
+        <menu type="toolbar">
+          <button>done</button>
+        </menu>
+        <h1>Edit</h1>
+      </header>
+    </section>
+    <menu>
+      <button>Delete all</button>
+      <button>Delete selected</button>
+    </menu>
+  </form>
+  </section>
+
+
+	<!--····························· Favoritos ·····························-->
+  <section role="region" id="favoritos" data-position="right" >
+    <header class="fixed">
+      <a id="btn-favoritos-back" href="#"><span class="icon icon-back">Volver</span></a>
+     <!--  <menu type="toolbar">
+            <a href="#" id="btn-edit-favoritos"><span class="icon icon-edit">edit</span></a>
+            <a href="#"><span class="icon icon-add">add</span></a>
+          </menu>-->
+      <h1 data-l10n-id="l10n_favoritos">Favoritos</h1>
+    </header>
+    <article class="content scrollable header">
+      
+      <section data-type="list" id="lista-favoritos">
+					
+				
+	  </section>
+      
+      
+    </article>
+  </section>
+
+  <!--····························· Acerca de ·····························-->
+  <section role="region" id="acercade" data-position="right">
+    <header class="fixed">
+      <a id="btn-acercade-back" href="#"><span class="icon icon-back">Volver</span></a>
+      <h1>Acerca de</h1>
+    </header>
+    <article class="content scrollable header">
+      
+      <section id="acerca-de">
+		
+		<h1>TiempoBus 0.3 beta</h1>
+		<p>alberapps.blogspot.com</p>
+		<p>
+			alberapps@gmail.com
+		</p>
+		<p>
+		Licencia GPLv3 www.gnu.org/licenses/gpl.html
+		</p>
+					
+	   </section>
+      
+      
+    </article>
+  </section>
+
+
+	<!--·························· Nuevo favorito ··························-->
+  <section role="region" id="favoritos-nuevo" data-position="right">
+    <header class="fixed">
+      <a id="btn-favoritos-nuevo-back" href="#"><span class="icon icon-back">Volver</span></a>
+      <h1 data-l10n-id="l10n_nuevo_fav">Nuevo Favorito</h1>
+    </header>
+    <article class="content scrollable header">
+      
+      <form>
+      	 <h2 data-l10n-id="l10n_titulo">Título:</h2>
+        <p>
+       
+          <input type="text" placeholder="Título" required id="input-titulo">
+          <button type="reset">Clear</button>
+        </p>
+
+		
+		<h2 data-l10n-id="l10n_descripcion">Descripción:</h2>
+        <p>
+        
+          <textarea placeholder="Descripción" required id="input-descrip"></textarea>
+        </p>
+
+        <p>
+          <button id="btn-guardar-form" data-l10n-id="l10n_guardar">Guardar</button>
+        </p>
+      </form>
+      
+    </article>
+  </section>
+
+
+<!--······························ Buscador ······························-->
+  <section id="buscador" data-position="right">
+    <section role="region">
+      <header class="fixed">
+        <a id="btn-buscador-back" href="#"><span class="icon icon-back">Volver</span></a>
+        <h1 data-l10n-id="l10n_buscador">Buscador <span id="progreso-buscador">						
+		</span>
+		</h1>
+        
+      </header>
+      <article class="content header">
+        <ul role="tablist" data-items="3" class="bottom">
+          
+          <li id="panel1" role="tab" >
+            <a href="#panel1" id="tab-1" data-l10n-id="l10n_lineas">Líneas</a>
+            <div role="tabpanel">
+            	<article class="content scrollable header">
+            		   
+            		    <section data-type="list" id="lista-lineas">
+							<ul>
+								<li><a href="#">
+										<p>Vacio</p>
+								</a></li>
+		
+							</ul>
+						</section>   
+            	       
+            	</article>
+            </div>
+          </li>
+          <li id="panel2" role="tab">
+            <a href="#panel2" id="tab-2" data-l10n-id="l10n_ida">Ida</a>
+            <div role="tabpanel">
+            	<article class="content scrollable header">
+            	
+            		 <section data-type="list" id="lista-ida">
+							<ul>
+								<li><a href="#">
+										<p>Vacio</p>
+								</a></li>
+		
+							</ul>
+						</section>   
+            	 
+            	</article>      
+            </div>
+          </li>          
+           <li id="panel3" role="tab">
+            <a href="#panel3" data-l10n-id="l10n_vuelta">Vuelta</a>
+            <div role="tabpanel">
+            	<article class="content scrollable header">
+            		 <section data-type="list" id="lista-vuelta">
+							<ul>
+								<li><a href="#">
+										<p>Vacio</p>
+								</a></li>
+		
+							</ul>
+						</section>        
+            	</article>    
+            </div>
+          </li>
+          
+        </ul>
+      </article>
+    </section>
+  </section>
+	
+</section>	
+
+<script type="text/javascript" defer src="tiempobus/js/app-nav.js"></script>
+<script type="text/javascript" defer src="tiempobus/js/app-tiempos.js"></script>
+<script type="text/javascript" defer src="tiempobus/js/app-favoritos.js"></script>
+<script type="text/javascript" defer src="tiempobus/js/app-buscador.js"></script>
+
+</body>
+</html>
