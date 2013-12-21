@@ -20,7 +20,7 @@
  * Funciones para la carga de tiempos
  */
 
-navigator.mozL10n.language.code = 'ca';
+//navigator.mozL10n.language.code = 'ca';
 
 /**
  * Activar progreso

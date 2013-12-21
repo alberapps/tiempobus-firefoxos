@@ -6,6 +6,7 @@
   "icons": {
     "16": "/tiempobus/img/ic_tiempobus_3-16.png",
     "48": "/tiempobus/img/ic_tiempobus_3-48.png",
+    "60": "/tiempobus/img/ic_tiempobus_3-60.png",
     "128": "/tiempobus/img/ic_tiempobus_3-128.png"
   },
   "developer": {
@@ -38,7 +39,9 @@
   
   "type": "privileged",
   "permissions": {
-        "systemXHR": {}	
+        "systemXHR": {
+          "description": "Permisos systemxhr"
+        }	
    }
 
 }
