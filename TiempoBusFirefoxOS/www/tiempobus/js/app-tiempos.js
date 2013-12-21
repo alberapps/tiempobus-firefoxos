@@ -54,7 +54,7 @@ function mostrarListaTiempos(listaTiempos) {
 	// Control de resultados
 	if (listaTiempos == null || listaTiempos.length == 0) {
 
-		htmlTiempos = "<div style='text-align:center'><h3>Sin resultados</h3></div>";
+		htmlTiempos = "<div style='text-align:center'><h3>" + navigator.mozL10n.get('l10n_sin_result') +"</h3></div>";
 
 	} else {
 		// Carga listado formateado
@@ -75,13 +75,12 @@ function mostrarListaTiempos(listaTiempos) {
 		//pie
 		
 		
-		htmlTiempos += '<p class="micro"> Tiempos obtenidos del sistema ISAE, que ofrece, en TIEMPO REAL, la ESTIMACIÓN de tiempos de paso de la red TAM.'
-	        + 'Estos tiempos pueden variar por razones ajenas a la aplicación, como el tráfico, cambios de recorrido, etc.'
-		    + 'Esta aplicación NO es oficial y se desarrolla de forma independiente.'
-			+ 'Datos de líneas y tiempos obtenidos de: www.subus.es y isaealicante.subus.es/movil/index.aspx'
-			+ 'Más información: alberapps.blogspot.com y en Twitter: @alberapps'			
-			+ '</p>';
-		
+		htmlTiempos += '<p class="micro">' + navigator.mozL10n.get('l10n_aviso')
+		+'<br/>' +navigator.mozL10n.get('l10n_aviso1')
+		+'<br/>' +navigator.mozL10n.get('l10n_aviso2')+'</p>';
+			
+			
+			
 		
 		
 		

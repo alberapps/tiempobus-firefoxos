@@ -114,10 +114,10 @@ function seleccionLinea(lineaId) {
 	console.debug("seleccion linea: " + linea);
 
 	// Ida
-	cargarParadas(linea, 'ida');
+	cargarParadas(linea);
 
 	// Vuelta
-	cargarParadas(linea, 'vuelta');
+	//cargarParadas(linea, 'vuelta');
 
 }
 
@@ -175,7 +175,7 @@ function mostrarListaParadas(listaParadas, sentido) {
  * @param linea
  * @param sentido
  */
-function cargarParadas(linea, sentido) {
+function cargarParadas(linea) {
 
 	/**
 	 * Funcion para gestionar la respuesta de la llamada
@@ -183,7 +183,91 @@ function cargarParadas(linea, sentido) {
 	function reqListenerParadas() {
 
 		var a = this.responseXML.documentElement;
+		
+		var folderPrincipalList = a.getElementsByTagName('Folder');
+		var folderIda = folderPrincipalList.item(1);
+		var folderVuelta = folderPrincipalList.item(2);
+		
+		var items = folderIda.getElementsByTagName('Placemark');
+		
+		for(var a = 0; a < 2; ++a){
+			
+			if(a==0){
+				items = folderIda.getElementsByTagName('Placemark');
+				sentido = "ida"
+			}else{
+				items = folderVuelta.getElementsByTagName('Placemark');
+				sentido = "vuelta"
+			}
+			
+			listaParadas = new Array();
+			
+			
+			
+		
+		for (var ii = 0; ii < items.length; ++ii) {
+			
+			item = items.item(ii);
+			datosPlaceMark = item.childNodes;
+			
+			for (var j = 0; j < datosPlaceMark.length; ++j) {
+				
+				dato = datosPlaceMark.item(j);
+				etiqueta = dato.nodeName;
+				//console.log("etiqueta: " + etiqueta);
+				
+				if (etiqueta == "name") {
+					direccion = dato.childNodes[0].nodeValue;
+				}
+				
+				if(etiqueta == 'description'){
+					
+					descripcion = dato.childNodes[0].nodeValue;
+					console.log("valor: " + descripcion);
+					
+					var procesaDesc = descripcion.split(" ");
 
+					var parada = procesaDesc[3].trim();
+
+					// posicion sentido
+					var sent = descripcion.indexOf("Sentido");
+					var neas = descripcion.indexOf("neas");
+
+					// lineas conexion
+					var lineas = descripcion.substring(neas + 5, sent).trim();
+
+					// Sentido
+					var sentidoRecorrido = descripcion.substring(sent + 8).trim();
+
+					console.debug("parada: " + parada + "lineas: " + lineas
+							+ "sentido: " + sentidoRecorrido);
+
+					var infoParada = new Object();
+
+					infoParada.parada = parada;
+					infoParada.descripcion = descripcion;
+					infoParada.lineas = lineas;
+					infoParada.sentido = sentidoRecorrido;
+					infoParada.direccion = direccion;
+
+					listaParadas.push(infoParada);
+					
+					
+				}
+				
+				
+			}
+			
+			mostrarListaParadas(listaParadas, sentido);
+			
+			
+		}
+		
+		}
+		
+		
+		
+/*
 		for (var ii = 0; ii < a.childNodes[1].childNodes[15].childNodes.length; ++ii) {
 
 			if (a.childNodes[1].childNodes[15].childNodes[ii].nodeName === 'Placemark') {
@@ -222,9 +306,9 @@ function cargarParadas(linea, sentido) {
 			}
 
 		}
-
-		mostrarListaParadas(listaParadas, sentido);
+*/
 		
+	
 		quitarSpinnerBuscador();
 
 	};
@@ -233,8 +317,11 @@ function cargarParadas(linea, sentido) {
 
 	var listaParadas = new Array();
 
-	var url = generarUrlLinea(linea, sentido);
+	//var url = generarUrlLinea(linea, sentido);
 
+	var url = generarUrlLineaNuevo(linea);
+		
+	
 	// Peticion de tiempos
 	var oReq = new XMLHttpRequest({
 		mozSystem : true
@@ -284,11 +371,11 @@ lineasDescripcion = [ "21 ALICANTE-P.S.JUAN-EL CAMPELLO",
 		"26 ALICANTE-VILLAFRANQUEZA-TANGEL", "27 ALICANTE-URBANOVA",
 		"30 SAN VICENTE-EL REBOLLEDO", "C-55 EL CAMPELLO-UNIVERSIDAD",
 		"34 LANZADERA UNIVERSIDAD", "35 ALICANTE-PAULINAS-MUTXAMEL",
-		"36 SAN GABRIEL-UNIVERSIDAD", "37 PADRE ESPLA-UNIVERSIDAD",
+		"36 SAN GABRIEL-UNIVERSIDAD",
 		"38 P.S.JUAN-H.ST.JOAN-UNIVERSIDAD", "39 EXPLANADA - C. TECNIFICACIÓN",
 		"21N ALICANTE- P.S.JUAN-EL CAMPELLO", "22N ALICANTE- PLAYA SAN JUAN",
 		"23N ALICANTE- MUTXAMEL", "24N ALICANTE-UNIVERSIDAD-S.VICENTE",
-		"25N PLAZA ESPAÑA - VILLAFRANQUEZA", "01 S. GABRIEL-JUAN XXIII  (1ºS)",
+		"01 S. GABRIEL-JUAN XXIII  (1ºS)",
 		"02 LA FLORIDA-SAGRADA FAMILIA", "03 CIUDAD DE ASIS-COLONIA REQUENA",
 		"04 CEMENTERIO-TOMBOLA", "05 EXPLANADA-SAN BLAS-RABASA",
 		"06 E.AUTOBUSES - COLONIA REQUENA", "07 AV.ÓSCAR ESPLÁ-REBOLLEDO",
@@ -305,24 +392,26 @@ lineasDescripcion = [ "21 ALICANTE-P.S.JUAN-EL CAMPELLO",
 		"C-54 UNIVERSIDAD-HOSP. SANT JOAN", "C6 ALICANTE-AEROPUERTO",
 		"45 HOSPITAL-GIRASOLES-MANCHEGOS",
 		"46A HOSPITAL-VILLAMONTES-S.ANTONIO",
-		"46B HOSPITAL-P.CANASTELL-P.COTXETA", "TURI BUS TURÍSTICO (TURIBUS)",
+		"46B HOSPITAL-P.CANASTELL-P.COTXETA",
 		"31 MUTXAMEL-ST.JOAN-PLAYA S. JUAN", "30P SAN VICENTE-PLAYA SAN JUAN",
 		"C6* ALICANTE-URBANOVA-AEROPUERTO" ];
 const
 lineasCodigoKml = [ "ALC21", "ALC22", "ALC23", "ALC24", "ALC25", "ALC26",
-		"ALC27", "ALC30", "ALCC55", "ALC34", "ALC35", "ALC36", "ALC37",
-		"ALC38", "ALC39", "ALC21N", "ALC22N", "ALC23N", "ALC24N", "ALC25N",
+		"ALC27", "ALC30", "ALCC55", "ALC34", "ALC35", "ALC36",
+		"ALC38", "ALC39", "ALC21N", "ALC22N", "ALC23N", "ALC24N",
 		"MAS01", "MAS02", "MAS03", "MAS04", "MAS05", "MAS06", "MAS07", "MAS8A",
 		"MAS09", "MAS10", "MAS11", "MAS11H", "MAS12", "MAS16", "MAS17",
 		"MAS8B", "MAS191", "MAS192", "MUTM", "MUT136", "CAMPC2", "ALCC51",
 		"ALCC52", "ALCC53", "ALCC54", "ALCC6", "ALCS45", "ALCS46A", "ALCS46B",
-		"Turibus", "ALC31", "ALC30B", "ALCC6" ];
+		"ALC31", "ALC30B", "ALCC6" ];
 const
 lineasNum = [ "21", "22", "23", "24", "25", "26", "27", "30", "C-55", "34",
-		"35", "36", "37", "38", "39", "21N", "22N", "23N", "24N", "25N", "01",
+		"35", "36", "38", "39", "21N", "22N", "23N", "24N", "01",
 		"02", "03", "04", "05", "06", "07", "8A", "09", "10", "11", "11H",
 		"12", "16", "17", "8B", "191", "192", "M", "CEM", "C2", "C-51", "C-52",
-		"C-53", "C-54", "C6", "45", "46A", "46B", "TURI", "31", "30P", "C6*" ];
+		"C-53", "C-54", "C6", "45", "46A", "46B", "31", "30P", "C6*" ];
+
+//25N 37 TURI
 
 /**
  * Url de consulta de la linea. Indicar el sentido de ida o vuelta
@@ -351,4 +440,29 @@ function generarUrlLinea(linea, sentido) {
 
 	return urlIda;
 
+	
+	//http://www.subus.es/K/ALC24P.xml
 }
+
+function generarUrlLineaNuevo(linea) {
+
+	var url = "http://www.subus.es/K/";
+
+	var urlSufijo = "";
+
+	
+	urlSufijo = "P.xml";
+	
+
+	var indiceLinea = lineasNum.indexOf(linea);
+
+	var urlCompleta = url + lineasCodigoKml[indiceLinea] + urlSufijo;
+
+	console.debug("urlIda: " + urlCompleta);
+
+	return urlCompleta;
+
+		
+}
+
+

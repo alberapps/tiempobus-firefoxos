@@ -18,9 +18,14 @@
  */
 
 // boton recarga tiempos
-document.querySelector('#boton-recarga').addEventListener('click', function() {
+document.querySelector('#boton-recarga').addEventListener('click', 
 
-	cargarTiempos();
+	function() {
+
+		console.debug('enviar datos: '
+				+ document.querySelector('#parada-entrada').value);
+
+		cargarTiempos(document.querySelector('#parada-entrada').value);
 
 });
 
@@ -167,3 +172,30 @@ document.querySelector('#btn-favoritos-modificar').addEventListener('click',
 		function() {
 			editarFavorito(favoritoSeleccionado);
 		});
+
+
+var viewURL = document.querySelector("#url-blog");
+if (viewURL) {
+    viewURL.onclick = function () {
+        var openURL = new MozActivity({
+            name: "view",
+            data: {
+                type: "url", // Possibly text/html in future versions
+                url: "http://alberapps.blogspot.com"
+            }
+        });
+    }
+}
+
+var viewURL = document.querySelector("#url-gpl");
+if (viewURL) {
+    viewURL.onclick = function () {
+        var openURL = new MozActivity({
+            name: "view",
+            data: {
+                type: "url", // Possibly text/html in future versions
+                url: "http://www.gnu.org/licenses/gpl.html"
+            }
+        });
+    }
+}
