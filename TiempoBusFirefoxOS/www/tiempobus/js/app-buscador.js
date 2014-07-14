@@ -22,6 +22,10 @@
  *  
  */
 
+var listaLineas = new Array();
+var listaParadasIda = new Array();
+var listaParadasVuelta = new Array();
+
 /**
  * Activar progreso
  */
@@ -51,7 +55,7 @@ function mostrarListaLineas(listaLineas) {
 
 	for (var i = 0; i < listaLineas.length; i++) {
 
-		htmlLineas += '<li><a href="#panel2" id="linea-' + listaLineas[i].linea
+		htmlLineas += '<li><a href="#" id="linea--' + listaLineas[i].linea
 				+ '">';
 		htmlLineas += '<p>' + listaLineas[i].descripcion + '</p>';
 		htmlLineas += '</a></li>';
@@ -65,7 +69,7 @@ function mostrarListaLineas(listaLineas) {
 	// Eventos de seleccion de linea
 	for (var jj = 0; jj < listaLineas.length; jj++) {
 
-		document.querySelector('#linea-' + listaLineas[jj].linea)
+		document.querySelector('#linea--' + listaLineas[jj].linea)
 				.addEventListener('click', function() {
 
 					console.log("linea seleccionada");
@@ -80,8 +84,8 @@ function mostrarListaLineas(listaLineas) {
  * Carga de lineas desde los listados de constantes
  */
 function cargarLineas() {
-
-	var listaLineas = new Array();
+	
+	listaLineas = new Array();
 
 	for (var i = 0; i < lineasNum.length; i++) {
 
@@ -107,11 +111,13 @@ function cargarLineas() {
  */
 function seleccionLinea(lineaId) {
 
-	var sp = lineaId.split("-");
+	var sp = lineaId.split("--");
 
 	var linea = sp[1];
 
 	console.debug("seleccion linea: " + linea);
+
+	document.querySelector('#cabecera_linea').innerHTML = getDescripcionLinea(linea); 
 
 	// Ida
 	cargarParadas(linea);
@@ -127,7 +133,7 @@ function seleccionLinea(lineaId) {
  * @param listaParadas
  * @param sentido
  */
-function mostrarListaParadas(listaParadas, sentido) {
+function mostrarListaParadas(listaParadas) {
 
 	var htmlLineas = '';
 
@@ -147,13 +153,13 @@ function mostrarListaParadas(listaParadas, sentido) {
 	htmlParadas += '</ul>';
 
 	// Carga del listado correspondiente
-	if (sentido == 'ida') {
+	//if (sentido == 'ida') {
 		console.debug('sentido ida');
-		document.querySelector("#lista-ida").innerHTML = htmlParadas;
-	} else if (sentido == 'vuelta') {
-		console.debug('sentido vuelta');
-		document.querySelector("#lista-vuelta").innerHTML = htmlParadas;
-	}
+		document.querySelector("#lista-lineas").innerHTML = htmlParadas;
+	//} else if (sentido == 'vuelta') {
+	//	console.debug('sentido vuelta');
+	//	document.querySelector("#lista-vuelta").innerHTML = htmlParadas;
+	//}
 
 	// Control de eventos de seleccion
 	for (var jj = 0; jj < listaParadas.length; jj++) {
@@ -176,19 +182,61 @@ function mostrarListaParadas(listaParadas, sentido) {
  * @param sentido
  */
 function cargarParadas(linea) {
+	
+	listaParadasIda = new Array();
+	listaParadasVuelta = new Array();
 
 	/**
 	 * Funcion para gestionar la respuesta de la llamada
 	 */
 	function reqListenerParadas() {
 
+	  try{
+
 		var a = this.responseXML.documentElement;
 		
 		var folderPrincipalList = a.getElementsByTagName('Folder');
-		var folderIda = folderPrincipalList.item(1);
-		var folderVuelta = folderPrincipalList.item(2);
+		
+		if(folderPrincipalList.length == 2){
+		
+
+			//Caso 2 sin anidar
+
+			var direccionalidad = folderPrincipalList.item(0).childNodes.item(1).childNodes.item(0).nodeValue;
+
+			 if(direccionalidad === 'Ida'){
+		        	folderIda = folderPrincipalList.item(0);
+			        folderVuelta = folderPrincipalList.item(1);
+		         }else{
+		     	        folderIda = folderPrincipalList.item(1);
+			        folderVuelta = folderPrincipalList.item(0);
+		         }
+
+
+			
+
+		}else{
+
+
+			var direccionalidad = folderPrincipalList.item(1).childNodes.item(1).childNodes.item(0).nodeValue;
+
+			 if(direccionalidad === 'Ida'){
+		        	folderIda = folderPrincipalList.item(1);
+			        folderVuelta = folderPrincipalList.item(2);
+		         }else{
+		     	        folderIda = folderPrincipalList.item(2);
+			        folderVuelta = folderPrincipalList.item(1);
+		         }
+
+
+		 }
+
+		//var folderIda = folderPrincipalList.item(1);
+		//var folderVuelta = folderPrincipalList.item(2);
 		
 		var items = folderIda.getElementsByTagName('Placemark');
+
+		
 		
 		for(var a = 0; a < 2; ++a){
 			
@@ -200,7 +248,7 @@ function cargarParadas(linea) {
 				sentido = "vuelta"
 			}
 			
-			listaParadas = new Array();
+			
 			
 			
 			
@@ -225,22 +273,36 @@ function cargarParadas(linea) {
 					descripcion = dato.childNodes[0].nodeValue;
 					console.log("valor: " + descripcion);
 					
-					var procesaDesc = descripcion.split(" ");
+					var procesaDesc = "";
+					var parada = "";
+					var sent = "";
+					var neas = "";
+					var lineas = "";
+					var sentidoRecorrido = "";
 
-					var parada = procesaDesc[3].trim();
+					try{
 
-					// posicion sentido
-					var sent = descripcion.indexOf("Sentido");
-					var neas = descripcion.indexOf("neas");
+						procesaDesc = descripcion.split(" ");
 
-					// lineas conexion
-					var lineas = descripcion.substring(neas + 5, sent).trim();
+						parada = procesaDesc[3].trim();
 
-					// Sentido
-					var sentidoRecorrido = descripcion.substring(sent + 8).trim();
+						// posicion sentido
+						sent = descripcion.indexOf("Sentido");
+						neas = descripcion.indexOf("neas");
 
-					console.debug("parada: " + parada + "lineas: " + lineas
-							+ "sentido: " + sentidoRecorrido);
+						// lineas conexion
+						lineas = descripcion.substring(neas + 5, sent).trim();
+
+						// Sentido
+						sentidoRecorrido = descripcion.substring(sent + 8).trim();
+
+						console.debug("parada: " + parada + "lineas: " + lineas
+								+ "sentido: " + sentidoRecorrido);
+
+					
+					}catch(e){
+					
+					}
 
 					var infoParada = new Object();
 
@@ -250,63 +312,36 @@ function cargarParadas(linea) {
 					infoParada.sentido = sentidoRecorrido;
 					infoParada.direccion = direccion;
 
-					listaParadas.push(infoParada);
-					
+					if(sentido == 'ida'){
+						listaParadasIda.push(infoParada);
+					}
+					else{
+						listaParadasVuelta.push(infoParada);
+					}		
 					
 				}
 				
 				
 			}
 			
-			mostrarListaParadas(listaParadas, sentido);
+			mostrarListaParadas(listaParadasIda);
+			document.querySelector('#panel1a').setAttribute('aria-selected','false');
+			document.querySelector('#panel2a').setAttribute('aria-selected','true');
+			document.querySelector('#panel3a').setAttribute('aria-selected','false');
 			
-			
 		}
 		
 		}
 		
 		
 		
-/*
-		for (var ii = 0; ii < a.childNodes[1].childNodes[15].childNodes.length; ++ii) {
+	   }catch(e){
+		
+		console.error("error paradas", e);
+		utils.status.show(navigator.mozL10n.get('l10n_error_paradas'));
 
-			if (a.childNodes[1].childNodes[15].childNodes[ii].nodeName === 'Placemark') {
+	   }
 
-				var direccion = a.childNodes[1].childNodes[15].childNodes[ii].childNodes[1].childNodes[0].nodeValue;
-
-				var descripcion = a.childNodes[1].childNodes[15].childNodes[ii].childNodes[3].childNodes[0].nodeValue;
-
-				var procesaDesc = descripcion.split(" ");
-
-				var parada = procesaDesc[3].trim();
-
-				// posicion sentido
-				var sent = descripcion.indexOf("Sentido");
-				var neas = descripcion.indexOf("neas");
-
-				// lineas conexion
-				var lineas = descripcion.substring(neas + 5, sent).trim();
-
-				// Sentido
-				var sentidoRecorrido = descripcion.substring(sent + 8).trim();
-
-				console.debug("parada: " + parada + "lineas: " + lineas
-						+ "sentido: " + sentidoRecorrido);
-
-				var infoParada = new Object();
-
-				infoParada.parada = parada;
-				infoParada.descripcion = descripcion;
-				infoParada.lineas = lineas;
-				infoParada.sentido = sentidoRecorrido;
-				infoParada.direccion = direccion;
-
-				listaParadas.push(infoParada);
-
-			}
-
-		}
-*/
 		
 	
 		quitarSpinnerBuscador();
@@ -365,53 +400,22 @@ function seleccionParada(paradaId) {
 
 // Informacione estatica de las lineas
 const
-lineasDescripcion = [ "21 ALICANTE-P.S.JUAN-EL CAMPELLO",
-		"22 ALICANTE-C. HUERTAS-P.S. JUAN", "23 ALICANTE-SANT JOAN-MUTXAMEL",
-		"24 ALICANTE-UNIVERSIDAD-S.VICENTE", "25 ALICANTE-VILLAFRANQUEZA",
-		"26 ALICANTE-VILLAFRANQUEZA-TANGEL", "27 ALICANTE-URBANOVA",
-		"30 SAN VICENTE-EL REBOLLEDO", "C-55 EL CAMPELLO-UNIVERSIDAD",
-		"34 LANZADERA UNIVERSIDAD", "35 ALICANTE-PAULINAS-MUTXAMEL",
-		"36 SAN GABRIEL-UNIVERSIDAD",
-		"38 P.S.JUAN-H.ST.JOAN-UNIVERSIDAD", "39 EXPLANADA - C. TECNIFICACIÓN",
-		"21N ALICANTE- P.S.JUAN-EL CAMPELLO", "22N ALICANTE- PLAYA SAN JUAN",
-		"23N ALICANTE- MUTXAMEL", "24N ALICANTE-UNIVERSIDAD-S.VICENTE",
-		"01 S. GABRIEL-JUAN XXIII  (1ºS)",
-		"02 LA FLORIDA-SAGRADA FAMILIA", "03 CIUDAD DE ASIS-COLONIA REQUENA",
-		"04 CEMENTERIO-TOMBOLA", "05 EXPLANADA-SAN BLAS-RABASA",
-		"06 E.AUTOBUSES - COLONIA REQUENA", "07 AV.ÓSCAR ESPLÁ-REBOLLEDO",
-		"8A VIRGEN DEL REMEDIO-EXPLANADA", "09 AV.OSCAR ESPLA - AV. NACIONES",
-		"10 EXPLANADA-C.C. VISTAHERMOSA", "11 PZ.LUCEROS-AV. DENIA-H.ST.JOAN",
-		"11H PZ.LUCEROS-H.ST JOAN", "12 AV. CONSTITUCION-S. BLAS(PAUI)",
-		"16 PZA. ESPAÑA-MERCADILLO TEULADA",
-		"17 ZONA NORTE-MERCADILLO TEULADA", "8B EXPLANADA-VIRGEN DEL REMEDIO",
-		"191 PLA - CAROLINAS - RICO PEREZ",
-		"192 C. ASIS - BENALUA - RICO PEREZ", "M MUTXAMEL-URBANITZACIONS",
-		"CEM MUTXAMEL - CEMENTERIO", "C2 VENTA LANUZA - EL CAMPELLO",
-		"C-51 MUTXAMEL - BUSOT", "C-52 BUSOT - EL CAMPELLO",
-		"C-53 HOSPITAL SANT JOAN - EL CAMPELLO",
-		"C-54 UNIVERSIDAD-HOSP. SANT JOAN", "C6 ALICANTE-AEROPUERTO",
-		"45 HOSPITAL-GIRASOLES-MANCHEGOS",
-		"46A HOSPITAL-VILLAMONTES-S.ANTONIO",
-		"46B HOSPITAL-P.CANASTELL-P.COTXETA",
-		"31 MUTXAMEL-ST.JOAN-PLAYA S. JUAN", "30P SAN VICENTE-PLAYA SAN JUAN",
-		"C6* ALICANTE-URBANOVA-AEROPUERTO" ];
+lineasDescripcion = ["21 ALICANTE-P.S.JUAN-EL CAMPELLO","22 ALICANTE-C. HUERTAS-P.S. JUAN","23 ALICANTE-SANT JOAN-MUTXAMEL","24 ALICANTE-UNIVERSIDAD-S.VICENTE","25 ALICANTE-VILLAFRANQUEZA","26 ALICANTE-VILLAFRANQUEZA-TANGEL","27 ALICANTE(O.ESPLA) - URBANOVA","30 SAN VICENTE-LA ALCORAYA","C-55 EL CAMPELLO-UNIVERSIDAD","35 ALICANTE-PAULINAS-MUTXAMEL","36 SAN GABRIEL-UNIVERSIDAD","38 P.S.JUAN-H.ST.JOAN-UNIVERSIDAD","39 EXPLANADA - C. TECNIFICACIÓN","21N ALICANTE- P.S.JUAN-EL CAMPELLO","22N ALICANTE- PLAYA SAN JUAN","23N ALICANTE-SANT JOAN- MUTXAMEL","24N ALICANTE-UNIVERSIDAD-S.VICENTE","01 S. GABRIEL-JUAN XXIII  (1ºS)","02 LA FLORIDA-SAGRADA FAMILIA","03 CIUDAD DE ASIS-COLONIA REQUENA","04 CEMENTERIO-TOMBOLA","05 EXPLANADA-SAN BLAS-RABASA","06 AV.ÓSCAR ESPLÁ - COLONIA REQUENA","07 AV.ÓSCAR ESPLÁ-EL REBOLLEDO","8A EXPLANADA -VIRGEN REMEDIO","09 AV.ÓSCAR ESPLÁ - AV. NACIONES","10 EXPLANADA - VIA PARQUE","11 V.REMEDIO-AV DENIA (JESUITAS)","11H V.REMEDIO-AV. DENIA-HOSP.ST JOAN","12 AV. CONSTITUCION-S. BLAS(PAUI)","16 PZA. ESPAÑA-MERCADILLO TEULADA","17 ZONA NORTE-MERCADILLO TEULADA","8B EXPLANADA-VIRGEN DEL REMEDIO","191 PLA - CAROLINAS - RICO PEREZ","192 C. ASIS - BENALUA - RICO PEREZ","M MUTXAMEL-URBANITZACIONS","136 MUTXAMEL - CEMENTERIO","C2 VENTA LANUZA - EL CAMPELLO","C-51 MUTXAMEL - BUSOT","C-52 BUSOT - EL CAMPELLO","C-53 HOSPITAL SANT JOAN - EL CAMPELLO","C-54 UNIVERSIDAD-HOSP. SANT JOAN","C-6 ALICANTE-AEROPUERTO","45 HOSPITAL-GIRASOLES-MANCHEGOS","46A HOSPITAL-VILLAMONTES-S.ANTONIO","46B HOSPITAL-P.CANASTELL-P.COTXETA","TURI BUS TURÍSTICO (TURIBUS)","31 MUTXAMEL-ST.JOAN-PLAYA S. JUAN","30P SAN VICENTE-PLAYA SAN JUAN","C-6* ALICANTE-URBANOVA-AEROPUERTO"];
 const
-lineasCodigoKml = [ "ALC21", "ALC22", "ALC23", "ALC24", "ALC25", "ALC26",
-		"ALC27", "ALC30", "ALCC55", "ALC34", "ALC35", "ALC36",
-		"ALC38", "ALC39", "ALC21N", "ALC22N", "ALC23N", "ALC24N",
-		"MAS01", "MAS02", "MAS03", "MAS04", "MAS05", "MAS06", "MAS07", "MAS8A",
-		"MAS09", "MAS10", "MAS11", "MAS11H", "MAS12", "MAS16", "MAS17",
-		"MAS8B", "MAS191", "MAS192", "MUTM", "MUT136", "CAMPC2", "ALCC51",
-		"ALCC52", "ALCC53", "ALCC54", "ALCC6", "ALCS45", "ALCS46A", "ALCS46B",
-		"ALC31", "ALC30B", "ALCC6" ];
+lineasCodigoKml = ["ALC21","ALC22","ALC23","ALC24","ALC25","ALC26","ALC27","ALC30","ALCC55","ALC35","ALC36","ALC38","ALC39","ALC21N","ALC22N","ALC23N","ALC24N","MAS01","MAS02","MAS03","MAS04","MAS05","MAS06","MAS07","MAS8A","MAS09","MAS10","MAS11","MAS11H","MAS12","MAS16","MAS17","MAS8B","MAS191","MAS192","MUTM","MUT136","CAMPC2","ALCC51","ALCC52","ALCC53","ALCC54","ALCC6","ALCS45","ALCS46A","ALCS46B","Turibus","ALC31","ALC30B","ALCC6"];
 const
-lineasNum = [ "21", "22", "23", "24", "25", "26", "27", "30", "C-55", "34",
-		"35", "36", "38", "39", "21N", "22N", "23N", "24N", "01",
-		"02", "03", "04", "05", "06", "07", "8A", "09", "10", "11", "11H",
-		"12", "16", "17", "8B", "191", "192", "M", "CEM", "C2", "C-51", "C-52",
-		"C-53", "C-54", "C6", "45", "46A", "46B", "31", "30P", "C6*" ];
+lineasNum = ["21","22","23","24","25","26","27","30","C-55","35","36","38","39","21N","22N","23N","24N","01","02","03","04","05","06","07","8A","09","10","11","11H","12","16","17","8B","191","192","M","136","C2","C-51","C-52","C-53","C-54","C-6","45","46A","46B","TURI","31","30P","C-6*" ];
 
-//25N 37 TURI
+//Posicion de la linea
+function getDescripcionLinea(linea){
+  for (var ii = 0; ii < lineasNum.length; ++ii) {
+     if(linea == lineasNum[ii]){
+        return lineasDescripcion[ii];
+     }
+  }	
+
+  return "";
+}
 
 /**
  * Url de consulta de la linea. Indicar el sentido de ida o vuelta

@@ -17,8 +17,56 @@
  * this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+var intervaloRecarga;
+
+//Carga inicial de informacion
+document.onreadystatechange = function(){
+
+	if(document.readyState == "complete"){
+
+		cargarPreferencias();
+
+		cargarTiempos(document.querySelector('#parada-entrada').value);
+
+		//Control de recarga auto
+		if(preferencias.cargaAutomatica){
+			intervaloRecarga = setInterval(intervalo, 60000);
+		}
+
+		console.debug('Carga inicial: ' + document.readyState);
+	}
+
+}
+
+/**
+* Funcion para la recarga automatica cada 60 segundos
+*/
+function intervalo(){
+	cargarTiempos(document.querySelector('#parada-entrada').value)
+}
+
+/**
+* Funciones a carga y cerrar cuando la aplicacion pasa a segundo plano
+*/
+document.addEventListener("visibilitychange", function(){
+	if(document.hidden){
+		console.debug("Aplicacion en segundo plano");	
+
+		//Desactivar recarga
+		clearInterval(intervaloRecarga);
+
+	}
+	else{
+		console.debug("Aplicacion abierta");
+
+		//Reactivar recarga
+		intervaloRecarga = setInterval(intervalo, 60000);
+	}
+});
+
+
 // boton recarga tiempos
-document.querySelector('#boton-recarga').addEventListener('click', 
+/*document.querySelector('#boton-recarga').addEventListener('click', 
 
 	function() {
 
@@ -27,7 +75,7 @@ document.querySelector('#boton-recarga').addEventListener('click',
 
 		cargarTiempos(document.querySelector('#parada-entrada').value);
 
-});
+});*/
 
 // boton nueva parada
 document.querySelector('#boton-enviar').addEventListener(
@@ -112,6 +160,52 @@ document
 					document.querySelector('[data-position="current"]').className = 'current';
 				});
 
+// buscador Tabs
+document
+		.querySelector('#panel1')
+		.addEventListener(
+				'click',
+				function() {
+
+					document.querySelector('#panel1a').setAttribute('aria-selected','true');
+					document.querySelector('#panel2a').setAttribute('aria-selected','false');
+					document.querySelector('#panel3a').setAttribute('aria-selected','false');
+					
+					mostrarListaLineas(listaLineas);
+
+				});
+
+document
+		.querySelector('#panel2')
+		.addEventListener(
+				'click',
+				function() {
+
+					document.querySelector('#panel1a').setAttribute('aria-selected','false');
+					document.querySelector('#panel2a').setAttribute('aria-selected','true');
+					document.querySelector('#panel3a').setAttribute('aria-selected','false');
+					
+					
+					mostrarListaParadas(listaParadasIda);
+
+				});
+
+document
+		.querySelector('#panel3')
+		.addEventListener(
+				'click',
+				function() {
+
+					document.querySelector('#panel1a').setAttribute('aria-selected','false');
+					document.querySelector('#panel2a').setAttribute('aria-selected','false');
+					document.querySelector('#panel3a').setAttribute('aria-selected','true');
+					
+					mostrarListaParadas(listaParadasVuelta)
+
+				});
+
+
+
 // favoritos
 document
 		.querySelector('#btn-action-preferencias')
@@ -195,6 +289,32 @@ if (viewURL) {
             data: {
                 type: "url", // Possibly text/html in future versions
                 url: "http://www.gnu.org/licenses/gpl.html"
+            }
+        });
+    }
+}
+
+var viewURL = document.querySelector("#url-subus");
+if (viewURL) {
+    viewURL.onclick = function () {
+        var openURL = new MozActivity({
+            name: "view",
+            data: {
+                type: "url", // Possibly text/html in future versions
+                url: "http://www.subus.es"
+            }
+        });
+    }
+}
+
+var viewURL = document.querySelector("#url-bfos");
+if (viewURL) {
+    viewURL.onclick = function () {
+        var openURL = new MozActivity({
+            name: "view",
+            data: {
+                type: "url", // Possibly text/html in future versions
+                url: "http://buildingfirefoxos.com/"
             }
         });
     }

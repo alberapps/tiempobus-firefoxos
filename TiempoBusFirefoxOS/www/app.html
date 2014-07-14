@@ -32,14 +32,13 @@
 <link rel="stylesheet" href="blocks/style/input_areas.css">
 <link rel="stylesheet" href="blocks/style/status.css">
 <link rel="stylesheet" href="blocks/style/switches.css">
-<link rel="stylesheet" href="blocks/style_unstable/drawer.css">
-<link rel="stylesheet" href="blocks/style_unstable/lists.css">
-<link rel="stylesheet"
-	href="blocks/style_unstable/progress_activity.css">
-<link rel="stylesheet" href="blocks/style_unstable/scrolling.css">
-<link rel="stylesheet" href="blocks/style_unstable/seekbars.css">
-<link rel="stylesheet" href="blocks/style_unstable/tabs.css">
-<link rel="stylesheet" href="blocks/style_unstable/toolbars.css">
+<link rel="stylesheet" href="blocks/style/drawer.css">
+<link rel="stylesheet" href="blocks/style/lists.css">
+<link rel="stylesheet" href="blocks/style/progress_activity.css">
+<link rel="stylesheet" href="blocks/style/scrolling.css">
+<link rel="stylesheet" href="blocks/style/seekbars.css">
+<link rel="stylesheet" href="blocks/style/tabs.css">
+<link rel="stylesheet" href="blocks/style/toolbars.css">
 
 <!-- Icons -->
 <link rel="stylesheet" href="blocks/icons/styles/action_icons.css">
@@ -52,159 +51,16 @@
 
 <!-- Util CSS: some extra tricks -->
 <link rel="stylesheet" href="blocks/util.css">
-<link rel="stylesheet" href="blocks/fonts.css">
+<!--link rel="stylesheet" href="blocks/fonts.css"-->
 
 <!-- Additional markup to make Building Blocks kind of cross browser -->
-<link rel="stylesheet" href="blocks/cross_browser.css">
+<!--<link rel="stylesheet" href="blocks/cross_browser.css"-->
 
-
+<link rel="stylesheet" href="tiempobus/css/tiempobus.css">
 
 <style>
-    #index {
-      height: 100%;
-    }
-    [data-position="right"] {
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      transform: translateX(100%);
-      -webkit-transform: translateX(100%);
-      z-index: 15;
-      z-index: 100; /* -> drawer */
-    }
-    section[role="region"][data-position="right"] {
-      position: absolute;
-    }
-    [data-position="right"].current {
-      animation: rightToCurrent 0.4s forwards;
-      -webkit-animation: rightToCurrent 0.4s forwards;
-    }
-    [data-position="right"].right {
-      animation: currentToRight 0.4s forwards;
-      -webkit-animation: currentToRight 0.4s forwards;
-    }
-    [data-position="current"].left {
-      animation: currentToLeft 0.4s forwards;
-      -webkit-animation: currentToLeft 0.4s forwards;
-    }
-    [data-position="current"].current {
-      animation: leftToCurrent 0.4s forwards;
-      -webkit-animation: leftToCurrent 0.4s forwards;
-    }
-    [data-position="back"] {
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      z-index: -1;
-      opacity: 0;
-      /* z-index: 100; -> drawer */
-    }
-    [data-position="back"].fade-in {
-      z-index: 120;
-      animation: fadeIn 0.2s forwards;
-      -webkit-animation: fadeIn 0.2s forwards;
-    }
-    [data-position="back"].fade-out {
-      animation: fadeOut 0.2s forwards;
-      -webkit-animation: fadeOut 0.2s forwards;
-    }
-
-    [data-position="edit-mode"] {
-      position: absolute;
-      top: -5rem;
-      left: 0;
-      right: 0;
-      bottom: -7rem;
-      z-index: -1;
-      opacity: 0;
-      transition: all 0.3s ease;
-    }
-    [data-position="edit-mode"].edit {
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      z-index: 120;
-      opacity: 1;
-    }
-
-    /* Headers */
-    #headers section[role="region"] {
-      margin-bottom: 1.5rem;
-    }
-    #headers section[role="region"]:not(#drawer) {
-      display: inline;
-    }
-    #headers article header:first-child {
-      margin-top: 1.5rem;
-    }
-    #headers section[role="region"] header h2 {
-      margin: 0 0 1.5rem 0;
-    }
-
-    /* Lists */
-    /* to avoid double background effect on press */
-    [data-type=list] li>a:active { 
-      background-color: transparent;
-    }
-
-    /* Drawer */
-    section[role="region"]:not(#drawer) {
-      transition: none;
-      left: 0;
-      z-index: 0;
-      padding-left: 0;
-    }
-    section[data-type="sidebar"] + section[role="region"] > header:first-child > button, 
-    section[data-type="sidebar"] + section[role="region"] > header:first-child > a {
-      background-position: 3.5rem center;
-    }
-
-    /* Switches */
-    #switches label:last-child {
-      margin-left: 2rem;  
-    }
-
-    /* Scrolling */
-    nav[data-type="scrollbar"] {
-      padding-top: 1rem;
-    }
-    nav[data-type="scrollbar"] p {
-      opacity: 1;
-    }
-
-    /* Seek bars */
-    div[role="slider"] > label.icon {
-      background: no-repeat right top;
-      background-size: 3rem auto;
-    }
     
-    /* Tabs */
-    #buscador .content {
-      padding: 0;
-    }
-    #buscador .content .content {
-      padding: 1.5rem 3rem;
-    }
 
-    /* Filters */
-    [role="tablist"][data-type="filter"] {
-      margin-bottom: 2rem;
-    }
-
-    .bottom[role="tablist"][data-type="filter"] {
-      bottom: auto;
-    }
-
-    /* Device rotation */
-    .landscape section[role="region"]#drawer > header:first-child {
-      /* Whatever needs to be changed on landscape */
-    }
 </style>
 
 
@@ -231,7 +87,7 @@
 				<ul>
 					<li><a id="btn-action-favoritos" href="#" data-l10n-id="l10n_favoritos">Favoritos</a></li>
 					<li><a href="#" id="btn-action-guardar" data-l10n-id="l10n_guardar">Guardar</a></li>
-					<li><a href="#panel1" id="btn-buscador" data-l10n-id="l10n_buscador">Buscador</a></li>
+					<li><a href="#" id="btn-buscador" data-l10n-id="l10n_buscador">Buscador</a></li>
 					<li><a id="btn-action-preferencias" href="#" data-l10n-id="l10n_preferencias">Preferencias</a></li>
 					
 					
@@ -240,7 +96,7 @@
 		</section>
 
 		<section id="drawer" role="region" >
-			<header class="fixed">
+			<header>
 				<a href="#"><span class="icon icon-menu">hide sidebar</span></a> <a
 					href="#drawer"><span class="icon icon-menu">show sidebar</span></a>
 				<h1>
@@ -250,12 +106,16 @@
 				</h1>
 				
 			</header>
+			<header>
+				<h2><span data-l10n-id="l10n_actualizado">Actualizado a las</span> <span id="hora_actualiza">00:00</span></h2>
+			</header>
+		
 			 
-			<article class="content scrollable header">
+			<article class="content scrollable">
 							
 				<section data-type="list" id="lista-tiempos" >
 							
-					<ul>
+					<ul id="lista-inicial">
 						<li><a href="#">
 							<p data-l10n-id="l10n_bienvenido">Bienvenido</p>
 							<p data-l10n-id="l10n_pulsa_act">Pulsa 'Actualizar' para empezar.</p>
@@ -265,16 +125,28 @@
 							
 				</section>
 
+				<section class="content scrollable">
+
+					<textarea class="microInput" data-l10n-id="l10n_aviso" disabled></textarea>
+
+
+				</section>
+
+			</article>
+
+			<article>
 
 				<div role="toolbar">
-				
-					<form role="search" class="bottom">
-						<button class="icon icon-attachment" id="boton-recarga" >Recargar</button>
-						<button type="submit" id="boton-enviar" data-l10n-id="l10n_actualizar">Actualizar</button>
-						<p>
-							<textarea placeholder="Search..." required="" id="parada-entrada">4450</textarea>
-						</p>
+					
+
+					<form role="search">
+					  <button type="submit" id="boton-enviar" data-l10n-id="l10n_actualizar">Actualizar </button>
+					  <p>
+					    <input type="text" placeholder="Search..." id="parada-entrada" required="" maxlength="4" value="4450"></input>
+					    <button type="reset">Clear</button>
+					  </p>
 					</form>
+
 				</div>
 
 				
@@ -364,23 +236,98 @@
   <section role="region" id="acercade" data-position="right">
     <header class="fixed">
       <a id="btn-acercade-back" href="#"><span class="icon icon-back">Volver</span></a>
-      <h1 data-l10n-id="l10n_acercade">Acerca de</h1>
+      <h1 data-l10n-id="l10n_acercade">Preferencias</h1>
     </header>
     <article class="content scrollable header">
       
+      <section data-type="list">
+
+	<ul data-type="edit">
+    	 <li>
+	      <label class="pack-checkbox">
+                <input type="checkbox" id='check_auto'>
+	        <span></span>
+	      </label>
+	      
+	        <p data-l10n-id="l10n_pref_tiempos">Tiempos</p>
+	       <p data-l10n-id="l10n_pref_tiempos_desc">Recarga automática</p>
+	      
+        </li>
+
+	</section>
+
+	<!--<label class="pack-switch">
+	  Hola <input type="checkbox" checked>
+	  <span></span>
+	</label>
+      </section>-->
+
       <section id="acerca-de">
 		
-		<h1>TiempoBus 0.3 beta</h1>
-		
-		<p><a href="#" id="url-blog">alberapps.blogspot.com</a></p>
-		<p>
+
+		<p class="large center"><img src="tiempobus/img/ic_tiempobus_3-60.png"/></p>
+
+		<p class="large center">TiempoBus 0.5 beta</p>	
+		<p class="small center">
+			Alberto Montiel (2014)
+		</p>	
+		<p class="small center"><a href="#" id="url-blog">alberapps.blogspot.com</a></p>
+		<p class="small center">
 			alberapps@gmail.com
 		</p>
-		<p><a href="#" id="url-gpl">
-		Licencia GPLv3 www.gnu.org/licenses/gpl.html
+		<p class="small center"><a href="#" id="url-gpl">
+		Licencia GPLv3<br/> www.gnu.org/licenses/gpl.html
 		</a>
 		</p>
-		<h2 data-l10n-id="l10n_aviso_ver">Esta es una versión preliminar y con funciones limitadas respecto a TiempoBus para Android</h2>
+		
+		<p class="small center" data-l10n-id="l10n_pref_subus">
+		Aplicación NO OFICIAL. Datos de líneas y tiempos ofrecidos y mantenidos por:			
+		</p>
+		<p class="small center"><a href="#" id="url-subus">
+		www.subus.es
+		</a>
+		</p>
+
+		<p class="small center" data-l10n-id="l10n_pref_bfos">
+		Aplicación construida mediante "Building Firefox OS":			
+		</p>
+		<p class="small center"><a href="#" id="url-bfos">
+		buildingfirefoxos.com
+		</a>
+		</p>
+
+
+
+		<p class="mini" data-l10n-id="l10n_aviso_ver">Esta es una versión preliminar y con funciones limitadas respecto a TiempoBus para Android</p>
+	
+<p class="mini" data-l10n-id="l10n_aviso_1">
+Tiempos obtenidos del sistema ISAE, que ofrece, en TIEMPO REAL, la ESTIMACIÓN de tiempos de paso de las redes TAM.
+Estos tiempos pueden variar por razones ajenas a la aplicación, como el tráfico, cambios de recorrido, etc.
+Las funciones que usan la base de datos, pueden no disponer de los últimos cambios en los recorridos.
+Esta aplicación NO es oficial y se desarrolla de forma independiente.
+Datos de líneas y tiempos obtenidos de: TAM(www.subus.es, isaealicante.subus.es/movil/index.aspx)
+Más información: alberapps.blogspot.com y twitter.com/alberapps
+</p>
+
+<p class="mini" data-l10n-id="l10n_aviso_2">
+Los nombres de empresas y logotipos de estas o sus productos, así como los datos obtenidos de sus páginas web, son propiedad de sus respectivos titulares y son reconocidos por esta aplicación.
+</p>
+
+<p class="mini">TiempoBus - Informacion sobre tiempos de paso de autobuses en Alicante<br/>
+ Copyright (C) 2014 Alberto Montiel<br/>
+ <br/>
+   This program is free software: you can redistribute it and/or modify<br/>
+   it under the terms of the GNU General Public License as published by<br/>
+   the Free Software Foundation, either version 3 of the License, or<br/>
+   (at your option) any later version.<br/>
+ <br/>
+   This program is distributed in the hope that it will be useful,<br/>
+   but WITHOUT ANY WARRANTY; without even the implied warranty of<br/>
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the<br/>
+   GNU General Public License for more details.<br/>
+ 
+   You should have received a copy of the GNU General Public License<br/>
+   along with this program. If not, see http://www.gnu.org/licenses/.</p>
 					
 	   </section>
       
@@ -424,14 +371,47 @@
 <!--······························ Buscador ······························-->
   <section id="buscador" data-position="right">
     <section role="region">
-      <header class="fixed">
+      <header >
         <a id="btn-buscador-back" href="#"><span class="icon icon-back">Volver</span></a>
         <h1 data-l10n-id="l10n_buscador">Buscador <span id="progreso-buscador">						
 		</span>
 		</h1>
         
       </header>
-      <article class="content header">
+	<header>
+		<h2><span id="cabecera_linea" data-l10n-id="l10n_infor_busc">Los recorridos se recuperan directamente de la web de subus.es</span></h2>	
+	</header>
+      <article class="content filtroTab">
+
+	<ul role="tablist" class="bb-tablist" data-type="filter">
+	  <li id="panel1" role="presentation"><a id="panel1a" href="#" role="tab" aria-selected="true" data-l10n-id="l10n_lineas">Líneas</a></a></li>
+  	  <li id="panel2" role="presentation"><a id="panel2a" href="#" role="tab" aria-selected="false" data-l10n-id="l10n_ida">Ida</a></li>
+  	  <li id="panel3" role="presentation"><a id="panel3a" href="#" role="tab" aria-selected="false" data-l10n-id="l10n_vuelta">Vuelta</a></li>
+	</ul>
+
+ </article>
+
+<article class="content scrollable">
+            		   
+	<section data-type="list" id="lista-lineas">
+		<ul>
+			<li><a href="#">
+				<p>Vacio</p>
+			</a></li>
+		
+		</ul>
+	</section>   
+           
+
+	<section class="scrollable">		
+	</section> 	       
+</article>
+
+
+
+
+
+<!--
         <ul role="tablist" data-items="3" class="bottom">
           
           <li id="panel1" role="tab" >
@@ -485,7 +465,9 @@
           </li>
           
         </ul>
-      </article>
+
+-->
+     
     </section>
   </section>
 	
@@ -495,6 +477,7 @@
 <script type="text/javascript" defer src="tiempobus/js/app-tiempos.js"></script>
 <script type="text/javascript" defer src="tiempobus/js/app-favoritos.js"></script>
 <script type="text/javascript" defer src="tiempobus/js/app-buscador.js"></script>
+<script type="text/javascript" defer src="tiempobus/js/app-preferencias.js"></script>
 
 </body>
 </html>

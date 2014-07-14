@@ -164,7 +164,7 @@ function cargarFavoritos(store) {
   };
   req.onerror = function(evt) {
     console.error("add error", this.error);
-    utils.status.show('Error al guardar el Favorito');
+    utils.status.show(navigator.mozL10n.get('l10n_favorito_guardar_ko'));
   };
 
   var i = 0;
@@ -258,10 +258,10 @@ function addFavorito(newParada, newTitulo, newDescripcion) {
 	document.querySelector('#input-descrip').value = '';
 	document.querySelector('#favoritos-nuevo').className = 'right';
 	document.querySelector('[data-position="current"]').className = 'current';
-	utils.status.show('Favorito guardado correctamente' );
+	utils.status.show(navigator.mozL10n.get('l10n_favorito_ok'));
   };
   req.onerror = function() {
-	  utils.status.show('Error al guardar el Favorito');
+	  utils.status.show(navigator.mozL10n.get('l10n_favorito_ko'));
   };
 }
 
@@ -320,14 +320,14 @@ function eliminarFavorito(parada){
 
 	
 	request.onsuccess = function(event) {
-		utils.status.show('Favorito borrado correctamente');
+		utils.status.show(navigator.mozL10n.get('l10n_favorito_borrado_ok'));
 		
 		cargarFavoritos();
 		
 	};
 	
 	request.onerror = function() {
-		  utils.status.show('Error al borrar el Favorito');
+		  utils.status.show(navigator.mozL10n.get('l10n_favorito_borrado_ko'));
 	  };
 }
 
@@ -341,7 +341,7 @@ function editarFavorito(parada){
 	var objectStore = transaction.objectStore("favoritos");
 	var request = objectStore.get(parada);
 	request.onerror = function(event) {
-		utils.status.show('Error al recuperar el Favorito');
+		utils.status.show(navigator.mozL10n.get('l10n_favorito_recupera_ko'));
 	};
 	request.onsuccess = function(event) {
 	 

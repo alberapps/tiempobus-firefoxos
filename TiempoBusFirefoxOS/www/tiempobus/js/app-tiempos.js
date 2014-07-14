@@ -54,7 +54,8 @@ function mostrarListaTiempos(listaTiempos) {
 	// Control de resultados
 	if (listaTiempos == null || listaTiempos.length == 0) {
 
-		htmlTiempos = "<div style='text-align:center'><h3>" + navigator.mozL10n.get('l10n_sin_result') +"</h3></div>";
+		htmlTiempos = "<div style='text-align:center'><h3>" + navigator.mozL10n.get('l10n_sin_result') +"</h3><h4>"
++ navigator.mozL10n.get('l10n_sin_resultados_2') +"</h4></div>";
 
 	} else {
 		// Carga listado formateado
@@ -75,9 +76,9 @@ function mostrarListaTiempos(listaTiempos) {
 		//pie
 		
 		
-		htmlTiempos += '<p class="micro">' + navigator.mozL10n.get('l10n_aviso')
-		+'<br/>' +navigator.mozL10n.get('l10n_aviso1')
-		+'<br/>' +navigator.mozL10n.get('l10n_aviso2')+'</p>';
+		//htmlTiempos += '<p class="content micro">' + navigator.mozL10n.get('l10n_aviso')
+		//+'<br/>' +navigator.mozL10n.get('l10n_aviso1')
+		//+'<br/>' +navigator.mozL10n.get('l10n_aviso2')+'</p>';
 			
 			
 			
@@ -97,12 +98,16 @@ function mostrarListaTiempos(listaTiempos) {
  */
 function cargarTiempos(parada) {
 
+	guardarPreferencia('paradaInicial')
+
 	/**
 	 * Funcion para gestionar la respuesta del servicio
 	 */
 	function reqListener() {
 
 		var listaTiempos = new Array();
+
+		try{
 
 		var a = this.responseXML.documentElement;
 		for (var ii = 0; ii < a.childNodes[0].childNodes[0].childNodes[0].childNodes.length; ++ii) {
@@ -139,10 +144,20 @@ function cargarTiempos(parada) {
 		// Mostrar lista cargada
 		mostrarListaTiempos(listaTiempos);
 
+		actualizarHora();
+
+		}catch(e){
+
+			console.error("add error", e);
+		        utils.status.show(navigator.mozL10n.get('l10n_tiempos_ko'));		
+
+		}
+
+
 		quitarSpinner();
 
 	}
-	;
+	
 
 	activarSpinner();
 
@@ -169,6 +184,30 @@ function cargarTiempos(parada) {
 }
 
 /**
+* Carga la hora de actualizacion en la cabecera
+*
+*/
+function actualizarHora(){
+	
+	var dia = new Date();
+	var hora = ("0" + dia.getHours()).slice(-2);
+	var minutos = ("0" + dia.getMinutes()).slice(-2);	
+
+	document.querySelector('#hora_actualiza').innerHTML = hora + ":" + minutos;
+
+}
+
+/**
+* Formatear hora
+*/
+function formatearHora(hora, minutos){
+	var hora = ("0" + hora).slice(-2);
+	var minutos = ("0" + minutos).slice(-2);	
+	
+	return hora + ":" + minutos;
+}
+
+/**
  * Formatea los tiempos recibidos
  * 
  * @param minutos1
@@ -190,7 +229,7 @@ function formatearTiempos(minutos1, minutos2) {
 		var dateTime = new Date();
 		var minutos1Int = parseInt(minutos1);
 		dateTime.setMinutes(new Date().getMinutes() + minutos1Int);
-		dato += " (" + dateTime.getHours() + ":" + dateTime.getMinutes() + ")"
+		dato += " (" + formatearHora(dateTime.getHours(),dateTime.getMinutes()) + ")"
 
 	} else {
 		
@@ -208,7 +247,7 @@ function formatearTiempos(minutos1, minutos2) {
 		var dateTime2 = new Date();
 		var minutos2Int = parseInt(minutos2);
 		dateTime2.setMinutes(new Date().getMinutes() + minutos2Int);
-		dato += " (" + dateTime2.getHours() + ":" + dateTime2.getMinutes()
+		dato += " (" + formatearHora(dateTime2.getHours(),dateTime2.getMinutes())
 				+ ")"
 
 	} else {

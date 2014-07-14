@@ -1,7 +1,7 @@
 {
-  "version": "0.3",
+  "version": "0.5",
   "name": "TiempoBus",
-  "description": "Tiempos de paso de autobuses en Alicante",
+  "description": "Tiempos de paso e información de líneas de autobuses en Alicante(Spain)",
   "launch_path": "/app.html#",
   "icons": {
     "16": "/tiempobus/img/ic_tiempobus_3-16.png",
@@ -17,19 +17,19 @@
   
   "locales": {
     "es": {
-      "description": "Tiempobus Alicante",
+      "description": "Tiempos de paso e información de líneas de autobuses en Alicante(Spain)",
       "developer": {
         "url": "http://alberapps.blogspot.com"
       }
     },
     "ca": {
-      "description": "Tiempobus Alacant",
+      "description": "Temps de pas i informació de línies d'autobusos a Alacant (Spain)",
       "developer": {
         "url": "http://alberapps.blogspot.com"
       }
     },
     "en": {
-      "description": "Tiempobus Alicante",
+      "description": "Times and information about bus lines in Alicante (Spain)",
       "developer": {
         "url": "http://alberapps.blogspot.com"
       }
